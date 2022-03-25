@@ -55,3 +55,9 @@ def register():
 
     else:
         return render_template("register.html")
+
+
+# @app.route("/login")
+# def login():
+    # session.clear()
+    # if request.method == "POST":

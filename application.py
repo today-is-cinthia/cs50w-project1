@@ -57,7 +57,30 @@ def register():
         return render_template("register.html")
 
 
-# @app.route("/login")
-# def login():
-    # session.clear()
-    # if request.method == "POST":
+@app.route("/login", methods=["GET","POST"])
+def login():
+    user = request.form.get("username")
+    session.clear()
+
+    if request.method == "POST":
+        rows = db.execute(
+            "SELECT * FROM users WHERE usuario = :usuario",
+                          {"usuario": user}).fetchall()
+
+        #if len(rows) != 1 or not check_password_hash(rows[0]["contraseña"], request.form.get("password")):
+           # flash('invalid username and/or password')
+            #return render_template("login.html")
+
+        session["user_id"] = rows[0]["id"]
+
+        return redirect("/")
+    else:
+        return render_template("login.html")
+    return render_template("login.html")
+
+@app.route("/logout")
+def salir():
+    session.clear()
+    return redirect("/")
+
+

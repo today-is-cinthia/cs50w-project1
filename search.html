@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Search
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<div class="container">
+    <div class="jumbotron">
+        <center>
+        <h1>Search for a book typing isbn, title or author</h1><br><br><br>
+        <form action="/search", method="post">
+            <div class="input-group">
+              <input type="text" class="form-control" placeholder="Search" name="search">
+              <div class="input-group-btn">
+                <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+              </div>
+            </div>
+          </form>
+    </center>
+    </div>
+</div>
+
+{% for busquedas in busqueda %}
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Isbn</th>
+                <th>Book title</th>
+                <th>Author</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{busquedas.isbn}}</td>
+                <td>{{busquedas.title}}</td>
+                <td>{{busquedas.author}}</td>
+                <td>{{busquedas.year}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,5 +1,7 @@
 
+#from crypt import methods
 import os
+from turtle import title
 
 from flask import Flask, session, flash, redirect, render_template, request, session, url_for, jsonify
 from flask_session import Session
@@ -8,11 +10,12 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 
+
 app = Flask(__name__)
 
-# Check for environment variable
-# if not os.getenv("DATABASE_URL"):
-#  raise RuntimeError("DATABASE_URL is not set")
+#Check for environment variable
+if not os.getenv("DATABASE_URL"):
+    raise RuntimeError("DATABASE_URL is not set")
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -51,7 +54,7 @@ def register():
             flash("username already exists")
             return render_template("register.html")
 
-        return redirect("/")
+        return redirect("/search")
 
     else:
         return render_template("register.html")
@@ -59,21 +62,20 @@ def register():
 
 @app.route("/login", methods=["GET","POST"])
 def login():
-    user = request.form.get("username")
     session.clear()
 
     if request.method == "POST":
         rows = db.execute(
             "SELECT * FROM users WHERE usuario = :usuario",
-                          {"usuario": user}).fetchall()
+                          {"usuario": request.form.get("username")}).fetchall()
 
-        #if len(rows) != 1 or not check_password_hash(rows[0]["contraseña"], request.form.get("password")):
-           # flash('invalid username and/or password')
-            #return render_template("login.html")
+        if len(rows) != 1 or not check_password_hash(rows[0]["contraseña"], request.form.get("password")):
+            flash('invalid username and/or password')
+            return render_template("login.html")
 
         session["user_id"] = rows[0]["id"]
 
-        return redirect("/")
+        return redirect("/search")
     else:
         return render_template("login.html")
     return render_template("login.html")
@@ -83,4 +85,14 @@ def salir():
     session.clear()
     return redirect("/")
 
+@app.route("/search", methods=["GET", "POST"])
+def search():
+    if request.method == "post":
+        search= request.form.get("search")
+        search={f"%search%"}
+
+        busqueda=db.execute("SELECT * FROM books WHERE isbn ILIKE :search OR title ILIKE :search OR author ILIKE :search OR author ILIKE :search", {"search": search}).fetchall()
+        return render_template("search.html", busqueda=busqueda)
+    else:
+        return render_template("search.html")
 

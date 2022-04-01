@@ -29,7 +29,7 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return render_template("inicio.html")
+    return render_template("index.html")
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -87,12 +87,17 @@ def salir():
 
 @app.route("/search", methods=["GET", "POST"])
 def search():
-    if request.method == "post":
+    if request.method == "POST":
         search= request.form.get("search")
-        search={f"%search%"}
-
-        busqueda=db.execute("SELECT * FROM books WHERE isbn ILIKE :search OR title ILIKE :search OR author ILIKE :search OR author ILIKE :search", {"search": search}).fetchall()
+        #search={f"%search%"}
+        busqueda = db.execute(
+            "SELECT * FROM books WHERE isbn ILIKE :isbn OR title ILIKE :title OR author ILIKE :author OR year ILIKE :year", 
+            {"isbn": search, "title": search, "author":search, "year":search}).fetchall()
         return render_template("search.html", busqueda=busqueda)
     else:
         return render_template("search.html")
 
+
+@app.route("/libros")
+def libros():
+    return render_template("libros.html")

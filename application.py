@@ -99,5 +99,7 @@ def search():
 
 
 @app.route("/libros")
-def libros():
+def libros(id):
+    search = db.execute(
+        "SELECT * FROM books WHERE id= :id", {"id":id}).fetchone()
     return render_template("libros.html")

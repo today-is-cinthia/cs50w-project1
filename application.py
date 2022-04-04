@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from loginrequired import login_required
 
 app = Flask(__name__)
 
@@ -86,6 +86,7 @@ def salir():
     return redirect("/")
 
 @app.route("/search", methods=["GET", "POST"])
+@login_required
 def search():
     if request.method == "POST":
         search= request.form.get("search")

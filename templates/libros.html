@@ -1,13 +1,15 @@
 {% extends "layout.html" %}
 {% block title %}
-
-{% endblock %}
 Books
+{% endblock %}
+
 {% block body %}
 <div  class="jumbotron text-center">
-    <h1><br>titulo del libro<br></h1>
-    <p>autor</p>
-    <p>año de publicación</p>
-    <p>isbn</p>
+  {% for resultado in resultados %}
+    <h1>{{resultado.title}}</h1>
+    <p>{{resultado.author}}</p>
+    <p>{{resultado.year}}</p>
+    <p>{{resultado.isbn}}</p>
+    {% endfor %} 
   </div>
 {% endblock %}

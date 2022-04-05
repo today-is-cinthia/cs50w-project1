@@ -99,8 +99,10 @@ def search():
         return render_template("search.html")
 
 
-@app.route("/libros")
+@app.route("/libros/<int: id>")
 def libros(id):
-    search = db.execute(
-        "SELECT * FROM books WHERE id= :id", {"id":id}).fetchone()
-    return render_template("libros.html")
+    #id_libro = db.execute("SELECT id FROM books WHERE id =:id", {"id": request.form.get("search")}).fetchone()
+
+    resultados = db.execute(
+        "SELECT * FROM books WHERE id =:id", {"id": id}).fetchall()
+    return render_template("libros.html", resultados=resultados)

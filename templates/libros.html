@@ -10,8 +10,27 @@ Books
     <center>
     <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
     <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
-  </center>
     {% endfor %}
+
+  </center>
+  </div>
+
+  <h3>Leave a review</h3>
+  <input type="text" name="rating" list="stars">
+    <datalist id="stars">
+      <option value="⭐">
+      <option value="⭐⭐">
+        <option value="⭐⭐⭐">
+          <option value="⭐⭐⭐⭐">
+            <option value="⭐⭐⭐⭐⭐">
+    </datalist>
+  <div class="form-group">
+    <br><label for="comment">Comment:</label>
+    <textarea name="comentario" class="form-control" rows="5" id="comment"></textarea><br>
+    <button type="submit" class="btn btn-primary">Submit</button>
   </div>
 </div>
+
+
+
 {% endblock %}

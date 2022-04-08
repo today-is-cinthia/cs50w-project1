@@ -99,11 +99,25 @@ def search():
         return render_template("search.html")
 
 
-@app.route("/libros/<int: id>")
-def libros(id):
+@app.route("/api/<isbn>")
+def api(isbn):
     #id_libro = db.execute("SELECT id FROM books WHERE id =:id", {"id": request.form.get("search")}).fetchone()
-    resultado = db.execute("SELECT * FROM books WHERE id = :id", {"id":id}).fetchall()
-        if not resultado:
+    resultado = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchall()
+
+    if not resultado:
         return render_template("error.html")
-    db.execute("INSERT INTO reviews (id_user, comentario, rating) VALUES (:id, : comentario, :rating)", {"id":session["user_id"], "comentario":})
+
+    #response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
+
+   # results = {
+    #    "title": resultado.title,
+     #   "author": resultado.author,
+      #  "year": resultado.year,
+       ##}
+
+       request.form.get("comentario")
+
+       db.execute("INSERT INTO reviews (id_user, comentario, rating) VALUES (:id, : comentario, :rating)", {"id":session["user_id"], "comentario":})
+
     return render_template("libros.html", resultado=resultado)
+

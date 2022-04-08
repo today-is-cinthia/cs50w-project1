@@ -4,12 +4,14 @@ Books
 {% endblock %}
 
 {% block body %}
-<div  class="jumbotron text-center">
-  {% for resultado in resultados %}
-    <h1>{{resultado.title}}</h1>
-    <p>{{resultado.author}}</p>
-    <p>{{resultado.year}}</p>
-    <p>{{resultado.isbn}}</p>
-    {% endfor %} 
+<div class="container">
+  <div class="jumbotron">
+    {% for books in resultado %}
+    <center>
+    <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
+    <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
+  </center>
+    {% endfor %}
   </div>
+</div>
 {% endblock %}

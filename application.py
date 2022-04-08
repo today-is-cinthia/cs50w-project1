@@ -103,4 +103,7 @@ def search():
 def libros(id):
     #id_libro = db.execute("SELECT id FROM books WHERE id =:id", {"id": request.form.get("search")}).fetchone()
     resultado = db.execute("SELECT * FROM books WHERE id = :id", {"id":id}).fetchall()
+        if not resultado:
+        return render_template("error.html")
+    db.execute("INSERT INTO reviews (id_user, comentario, rating) VALUES (:id, : comentario, :rating)", {"id":session["user_id"], "comentario":})
     return render_template("libros.html", resultado=resultado)

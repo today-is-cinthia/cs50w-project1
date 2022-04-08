@@ -37,8 +37,8 @@ Search
         <tbody>
             {% for busquedas in busqueda %}
             <tr>
-                <td><a href="/libros/<int:id>">{{busquedas.isbn}}</a></td>
-                <td><a href="/libros/ "> {{busquedas.title}}</a></td>
+                <td><a href="{{url_for('libros', id=busquedas.id)}}">{{busquedas.isbn}}</a></td>
+                <td><a href="{{url_for('libros', id=busquedas.id)}}"> {{busquedas.title}}</a></td>
                 <td>{{busquedas.author}}</td>
                 <td>{{busquedas.year}}</td>
             </tr>

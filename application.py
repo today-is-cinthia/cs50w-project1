@@ -89,35 +89,28 @@ def salir():
 @login_required
 def search():
     if request.method == "POST":
-        search= request.form.get("search")
-        #search={f"%search%"}
+        search= request.form.get("search").capitalize()
+        search = ("%"+ search +"%")
         busqueda = db.execute(
-            "SELECT * FROM books WHERE isbn ILIKE :isbn OR title ILIKE :title OR author ILIKE :author OR year ILIKE :year", 
-            {"isbn": search, "title": search, "author":search, "year":search}).fetchall()
+            "SELECT * FROM books WHERE isbn LIKE :search OR title LIKE :search OR author LIKE :search OR year LIKE :search", 
+            {"search":search}).fetchall()
         return render_template("search.html", busqueda=busqueda)
     else:
         return render_template("search.html")
 
 
-@app.route("/api/<isbn>")
-def api(isbn):
+@app.route("/libros/<isbn>",methods=['GET','POST'])
+def libros(isbn):
     #id_libro = db.execute("SELECT id FROM books WHERE id =:id", {"id": request.form.get("search")}).fetchone()
     resultado = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchall()
 
-    if not resultado:
+    if resultado is None:
         return render_template("error.html")
-
-    #response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
-
-   # results = {
-    #    "title": resultado.title,
-     #   "author": resultado.author,
-      #  "year": resultado.year,
-       ##}
-
-       request.form.get("comentario")
-
-       db.execute("INSERT INTO reviews (id_user, comentario, rating) VALUES (:id, : comentario, :rating)", {"id":session["user_id"], "comentario":})
-
+    else:
+        if request.method == "POST":
+            book_id = request.form.get('book_id')
+            db.execute("INSERT INTO reviews (id_book, usuario, comentario, rating) VALUES (:id_book,:usuario, :comentario, :rating)", {"id_book": book_id,"usuario": session["user_id"], "comentario": request.form.get("comentario"), "rating": int(request.form.get("rating"))})
+            db.commit()
+            return redirect("/")
     return render_template("libros.html", resultado=resultado)
 

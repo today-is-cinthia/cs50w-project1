@@ -10,27 +10,28 @@ Books
     <center>
     <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
     <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
-    {% endfor %}
-
   </center>
-  </div>
-
-  <h3>Leave a review</h3>
-  <input type="text" name="rating" list="stars">
-    <datalist id="stars">
-      <option value="⭐">
-      <option value="⭐⭐">
-        <option value="⭐⭐⭐">
-          <option value="⭐⭐⭐⭐">
-            <option value="⭐⭐⭐⭐⭐">
-    </datalist>
-  <div class="form-group">
-    <br><label for="comment">Comment:</label>
-    <textarea name="comentario" class="form-control" rows="5" id="comment"></textarea><br>
-    <button type="submit" class="btn btn-primary">Submit</button>
+    {% endfor %}
   </div>
 </div>
 
+<h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3>
+<input type="hidden" name="book_id" value="{{resultado.id}}" />
+<form action="/libros/<isbn>" , method="post">
+  <div class="form-group" >
+    <label  style="margin-left: 150px;" for="sel1">Rate with stars:</label>
+    <select  style="margin-left: 150px; width: 160px;" class="form-control" name="rating">
+      <option value="1">⭐</option>
+      <option value="2">⭐⭐</option>
+      <option value="3">⭐⭐⭐</option>
+      <option value="4">⭐⭐⭐⭐</option>
+      <option value="5">⭐⭐⭐⭐⭐</option>
+    </select>
+  <br><label  style="margin-left: 150px;"  for="comment">Comment:</label>
+  <textarea  style="margin-left: 150px; width: 600px;"  name="comentario" class="form-control" rows="5" id="comment"></textarea><br>
+  <button  style="margin-left: 150px;"  type="submit" class="btn btn-primary">Submit</button>
+</div>
+</form>
 
 
 {% endblock %}

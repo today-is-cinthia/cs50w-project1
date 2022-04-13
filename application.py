@@ -10,6 +10,7 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 from loginrequired import login_required
+import requests
 
 app = Flask(__name__)
 
@@ -101,16 +102,39 @@ def search():
 
 @app.route("/libros/<isbn>",methods=['GET','POST'])
 def libros(isbn):
-    #id_libro = db.execute("SELECT id FROM books WHERE id =:id", {"id": request.form.get("search")}).fetchone()
+    book_id = request.form.get('book_id')
+    global goodreads
+    global count
+    global rating
+
+    if request.method == "POST":
+        count = 0
+        rating = request.form.get("rating")
+        comentario = request.form.get("comentario")
+        #if rating or comentario == "":
+            #return render_template("error.html")
+        db.execute("INSERT INTO reviews (usuario, comentario, rating, id_book) VALUES (:usuario, :comentario, :rating, :id_book)", {"usuario": session["user_id"], "comentario": comentario, "rating": rating, "id_book": book_id})
+        db.commit()
+            
     resultado = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchall()
 
     if resultado is None:
-        return render_template("error.html")
-    else:
-        if request.method == "POST":
-            book_id = request.form.get('book_id')
-            db.execute("INSERT INTO reviews (id_book, usuario, comentario, rating) VALUES (:id_book,:usuario, :comentario, :rating)", {"id_book": book_id,"usuario": session["user_id"], "comentario": request.form.get("comentario"), "rating": int(request.form.get("rating"))})
-            db.commit()
-            return redirect("/")
-    return render_template("libros.html", resultado=resultado)
+        return render_template("libros.html")
+    
+    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id;",{"id":book_id}).fetchall()
+    if request.method == "GET":
+        try:
+            validation = db.execute("SELECT usuario FROM reviews WHERE id_book = :id AND usuario = :usuario", {"id": book_id, "usuario": session["user_id"]}).fetchone()
+            if validation != None:
+                return render_template("error.html")
+        except:
+            pass
+        if "AIzaSyCPNyAngETN9xr7U7XAU_gDALxG3Tttbi4":
+            response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"access_key":'AIzaSyCPNyAngETN9xr7U7XAU_gDALxG3Tttbi4', "isbns": isbn})
+            if response.status_code != 200:
+                raise Exception("Request to goodreads was unsuccessful")
+            goodreads = response.json().get('books')[0]
+            count = goodreads.get('work_ratings_count')
+            rating = goodreads.get('average_rating')
+    return render_template("libros.html", resultado=resultado, count=count, rating=rating, reviews=reviews)
 

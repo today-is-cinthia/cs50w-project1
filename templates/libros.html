@@ -10,10 +10,13 @@ Books
     <center>
     <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
     <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
+    <p>number of ratings: {{count}}</p>
+    <p>average ratings: {{rating}}</p>
   </center>
     {% endfor %}
   </div>
 </div>
+
 
 <h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3>
 <input type="hidden" name="book_id" value="{{resultado.id}}" />
@@ -32,6 +35,12 @@ Books
   <button  style="margin-left: 150px;"  type="submit" class="btn btn-primary">Submit</button>
 </div>
 </form>
+
+{% for i in reviews %}
+<p>{{i.usuario}} / {{i.rating}}</p>
+<p>{{i.comentario}}</p>
+{%endfor%}
+
 
 
 {% endblock %}

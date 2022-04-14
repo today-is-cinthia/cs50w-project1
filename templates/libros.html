@@ -10,15 +10,21 @@ Books
     <center>
     <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
     <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
-    <p>number of ratings: {{count}}</p>
-    <p>average ratings: {{rating}}</p>
+    <p>number of ratings: {{counts}}</p>
+    <p>average ratings: {{ratings}}</p>
   </center>
     {% endfor %}
+
+{% for review in reviews %}
+<p>{{review.id_user}} / {{review.rating}}</p>
+<p>{{review.comentario}}</p>
+{% endfor %} 
   </div>
 </div>
 
 
-<h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3>
+<h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3><br>
+
 <input type="hidden" name="book_id" value="{{resultado.id}}" />
 <form action="/libros/<isbn>" , method="post">
   <div class="form-group" >
@@ -36,10 +42,6 @@ Books
 </div>
 </form>
 
-{% for i in reviews %}
-<p>{{i.usuario}} / {{i.rating}}</p>
-<p>{{i.comentario}}</p>
-{%endfor%}
 
 
 

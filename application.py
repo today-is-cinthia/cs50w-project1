@@ -103,38 +103,22 @@ def search():
 @app.route("/libros/<isbn>",methods=['GET','POST'])
 def libros(isbn):
     book_id = request.form.get('book_id')
-    global goodreads
-    global count
-    global rating
+    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id", {"id": book_id})
+    rating = request.form.get("rating")
+    comentario = request.form.get("comentario")
 
     if request.method == "POST":
-        count = 0
-        rating = request.form.get("rating")
-        comentario = request.form.get("comentario")
-        #if rating or comentario == "":
-            #return render_template("error.html")
-        db.execute("INSERT INTO reviews (usuario, comentario, rating, id_book) VALUES (:usuario, :comentario, :rating, :id_book)", {"usuario": session["user_id"], "comentario": comentario, "rating": rating, "id_book": book_id})
+        db.execute("INSERT INTO reviews (comentario, rating, id_book, id_user) VALUES (:comentario, :rating, :id_book, :id)", { "comentario": comentario, "rating": rating, "id_book": book_id, "id": session["user_id"]})
         db.commit()
+        return redirect("/libros/<isbn>")
+
+    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id", {"id": book_id}).fetchall()
             
     resultado = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchall()
 
-    if resultado is None:
-        return render_template("libros.html")
+    response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
     
-    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id;",{"id":book_id}).fetchall()
-    if request.method == "GET":
-        try:
-            validation = db.execute("SELECT usuario FROM reviews WHERE id_book = :id AND usuario = :usuario", {"id": book_id, "usuario": session["user_id"]}).fetchone()
-            if validation != None:
-                return render_template("error.html")
-        except:
-            pass
-        if "AIzaSyCPNyAngETN9xr7U7XAU_gDALxG3Tttbi4":
-            response = requests.get("https://www.goodreads.com/book/review_counts.json", params={"access_key":'AIzaSyCPNyAngETN9xr7U7XAU_gDALxG3Tttbi4', "isbns": isbn})
-            if response.status_code != 200:
-                raise Exception("Request to goodreads was unsuccessful")
-            goodreads = response.json().get('books')[0]
-            count = goodreads.get('work_ratings_count')
-            rating = goodreads.get('average_rating')
-    return render_template("libros.html", resultado=resultado, count=count, rating=rating, reviews=reviews)
+    count = response['items'][0]['volumeInfo']['ratingsCount']
+    rating = response['items'][0]['volumeInfo']['averageRating']
+    return render_template("libros.html",counts=count, ratings=rating, resultado=resultado,reviews=reviews)
 

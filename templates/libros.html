@@ -6,27 +6,22 @@ Books
 {% block body %}
 <div class="container">
   <div class="jumbotron">
-    {% for books in resultado %}
     <center>
-    <h1  style="font-family:  'Lora', serif;">{{books.title}}</h1><br>
-    <p>by {{books.author}} <br> Published in {{books.year}} <br> Isbn: {{books.isbn}}</p>
-    <p>number of ratings: {{counts}}</p>
-    <p>average ratings: {{ratings}}</p>
+      <h1  style="font-family:  'Lora', serif;">{{resultados[0]['title']}}</h1><br>
+      <p>by {{resultados[0]['author']}}</p>
+      <p>Published in {{resultados[0]['year']}}</p>
+      <p>Isbn: {{resultados[0]['isbn']}}</p>
+      <p>number of ratings: {{count}}</p>
+      <p>average ratings: {{rating}}</p>
   </center>
-    {% endfor %}
 
-{% for review in reviews %}
-<p>{{review.id_user}} / {{review.rating}}</p>
-<p>{{review.comentario}}</p>
-{% endfor %} 
   </div>
 </div>
 
-
 <h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3><br>
-
-<input type="hidden" name="book_id" value="{{resultado.id}}" />
-<form action="/libros/<isbn>" , method="post">
+{% for books in resultados %}
+<form action="/libros/{{books.isbn}}" , method="post">
+  {% endfor %} 
   <div class="form-group" >
     <label  style="margin-left: 150px;" for="sel1">Rate with stars:</label>
     <select  style="margin-left: 150px; width: 160px;" class="form-control" name="rating">
@@ -42,7 +37,9 @@ Books
 </div>
 </form>
 
-
-
-
+{% for review in ayudas %}
+<p>{{ review['usuario'] }}</p>
+<p>{{ review['rating'] }}</p>
+<p>{{ review['comentario'] }}</p>
+{% endfor %} 
 {% endblock %}

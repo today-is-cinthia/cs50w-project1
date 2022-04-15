@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from werkzeug.security import check_password_hash, generate_password_hash
 from loginrequired import login_required
 import requests
+import json
 
 app = Flask(__name__)
 
@@ -102,23 +103,68 @@ def search():
 
 @app.route("/libros/<isbn>",methods=['GET','POST'])
 def libros(isbn):
-    book_id = request.form.get('book_id')
-    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id", {"id": book_id})
-    rating = request.form.get("rating")
-    comentario = request.form.get("comentario")
-
     if request.method == "POST":
-        db.execute("INSERT INTO reviews (comentario, rating, id_book, id_user) VALUES (:comentario, :rating, :id_book, :id)", { "comentario": comentario, "rating": rating, "id_book": book_id, "id": session["user_id"]})
+        rating = int(request.form.get("rating"))
+        comentario = request.form.get("comentario")
+
+        query = db.execute("SELECT id FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+        if query is not None:
+            query = query[0]
+
+        validate = db.execute("SELECT * FROM reviews WHERE \
+        id_user = :id_user AND id_book = :id_book", {"id_user": session["user_id"], "id_book": query})
+        if validate.rowcount == 1:
+            return render_template("error.html")
+        
+        db.execute("INSERT INTO reviews (comentario, rating, id_book, id_user) VALUES (:comentario, :rating, :id_book, :id)",
+         { "comentario": comentario, "rating": rating, "id_book": query, "id": session["user_id"]})
         db.commit()
-        return redirect("/libros/<isbn>")
+        return redirect("/libros/" + isbn)
+  
+    if request.method == "GET":
+        resultado = db.execute("SELECT isbn, title, author, year FROM books WHERE isbn = :isbn", {"isbn":isbn})
+        resultado = resultado.fetchall()
 
-    reviews = db.execute("SELECT * FROM reviews WHERE id_book = :id", {"id": book_id}).fetchall()
-            
-    resultado = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn":isbn}).fetchall()
+        response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
 
-    response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn).json()
+        formato = response['items'][0]
+        count = formato['volumeInfo']['ratingsCount']
+        rating = formato['volumeInfo']['averageRating']
+
+        resultado.append(formato)
+        query = db.execute("SELECT id FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+        if query is not None:
+            query = query[0]
+
+        ayuda = db.execute("SELECT users.usuario, comentario, rating FROM users \
+         INNER JOIN reviews ON users.id = reviews.id_user WHERE id_book = :id_book", {"id_book": query})
+        ya_duermanme_como_a_los_perritos = ayuda.fetchall()
+    return render_template("libros.html", resultados=resultado, ayudas = ya_duermanme_como_a_los_perritos, count = count, rating = rating, isbn=isbn)
+
+@app.route("/api/<isbn>",methods=['GET','POST'])
+def api(isbn):
+    a = db.execute("SELECT * FROM books WHERE isbn = :isbn", {"isbn": isbn}).fetchone()
+
+    if a == None:
+        return jsonify({"Error": "invalid/incorrect isbn"})
     
-    count = response['items'][0]['volumeInfo']['ratingsCount']
-    rating = response['items'][0]['volumeInfo']['averageRating']
-    return render_template("libros.html",counts=count, ratings=rating, resultado=resultado,reviews=reviews)
+    response = requests.get("https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn)
+
+    if response.status_code != 200:
+        raise Exception("Failed to request api")
+    
+    response = response.json()
+    formato = response['items'][0]
+    count = formato['volumeInfo']['ratingsCount']
+    rating = formato['volumeInfo']['averageRating']
+
+    return jsonify({
+        "title": a.title,
+        "author": a.author,
+        "year": a.year,
+        "isbn": a.isbn,
+        "rating_count": count,
+        "average_rating": rating 
+    })
+
 

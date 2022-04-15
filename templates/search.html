@@ -10,7 +10,14 @@ Search
     <div class="jumbotron">
         <center>
         <h1 style="font-family:  'Lora', serif;">Search for a book</h1>
-        <p>Feel free to search for a isbn, title, author or even year</p>
+        <p>Feel free to search for a isbn, title, author or even year</p><br><br>
+        {% if get_flashed_messages() %}
+    <header>
+      <div style="font-family: 'Rubik Bubbles', cursive" class="alert alert-danger" role="alert">
+        {{ get_flashed_messages() | join(" ") }}
+      </div>
+    </header>
+  {% endif %}
         <form action="/search", method="post">
             <div class="input-group">
               <input type="text" class="form-control" placeholder="Search" name="search">
@@ -23,7 +30,7 @@ Search
     </div>
 </div>
 
-
+{% if busqueda %}
 <div class="container">
     <table class="table table-bordered">
         <thead>
@@ -46,4 +53,6 @@ Search
         </tbody>
     </table>
 </div>
-{% endblock %}a 
+{% endif %}
+{% endblock %}
+

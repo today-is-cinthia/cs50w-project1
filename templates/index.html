@@ -5,12 +5,20 @@
 
 {% block main %}
 <div class="container">
+  {% if get_flashed_messages() %}
+    <header>
+      <div style="font-family: 'Rubik Bubbles', cursive; width: 1015px;" class="alert alert-success" role="alert">
+        {{ get_flashed_messages() | join(" ") }}
+      </div>
+    </header>
+  {% endif %}
     <div class="jumbotron">
       <center>
       <h1  style="font-family:  'Lora', serif;">Review Books</h1>      
-      <br><p>Search, read and create book reviews for free</p>
+      <br><p style="font-family: 'Rubik Bubbles', cursive">Search, read and create book reviews for free</p><br>
+      <img src="https://cdn.britannica.com/92/216092-131-5FF4D1E7/custom-library.jpg" alt="">  
     </center>
-    </div>    
+    </div>
   </div>
 
 {% endblock %}

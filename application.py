@@ -53,10 +53,11 @@ def register():
                        {"username": user, "password": generate_password_hash(password)})
             db.commit()
         elif rows:
-            flash("username already exists")
+            flash("Username already exists. Try again")
             return render_template("register.html")
 
-        return redirect("/search")
+        flash('Welcome to Search Books!')
+        return redirect("/")
 
     else:
         return render_template("register.html")
@@ -72,12 +73,12 @@ def login():
                           {"usuario": request.form.get("username")}).fetchall()
 
         if len(rows) != 1 or not check_password_hash(rows[0]["contraseña"], request.form.get("password")):
-            flash('invalid username and/or password')
+            flash('Invalid username and/or password')
             return render_template("login.html")
 
         session["user_id"] = rows[0]["id"]
-
-        return redirect("/search")
+        flash('Welcome to Search Books!')
+        return redirect("/")
     else:
         return render_template("login.html")
     return render_template("login.html")
@@ -85,6 +86,7 @@ def login():
 @app.route("/logout")
 def salir():
     session.clear()
+    flash('You succesfully logged out')
     return redirect("/")
 
 @app.route("/search", methods=["GET", "POST"])
@@ -96,6 +98,8 @@ def search():
         busqueda = db.execute(
             "SELECT * FROM books WHERE isbn LIKE :search OR title LIKE :search OR author LIKE :search OR year LIKE :search", 
             {"search":search}).fetchall()
+        if not busqueda:
+            flash('No matches found')
         return render_template("search.html", busqueda=busqueda)
     else:
         return render_template("search.html")
@@ -114,11 +118,12 @@ def libros(isbn):
         validate = db.execute("SELECT * FROM reviews WHERE \
         id_user = :id_user AND id_book = :id_book", {"id_user": session["user_id"], "id_book": query})
         if validate.rowcount == 1:
-            return render_template("error.html")
+            flash('You can only publish one review per book')
+        else:
         
-        db.execute("INSERT INTO reviews (comentario, rating, id_book, id_user) VALUES (:comentario, :rating, :id_book, :id)",
-         { "comentario": comentario, "rating": rating, "id_book": query, "id": session["user_id"]})
-        db.commit()
+            db.execute("INSERT INTO reviews (comentario, rating, id_book, id_user) VALUES (:comentario, :rating, :id_book, :id)",
+            { "comentario": comentario, "rating": rating, "id_book": query, "id": session["user_id"]})
+            db.commit()
         return redirect("/libros/" + isbn)
   
     if request.method == "GET":

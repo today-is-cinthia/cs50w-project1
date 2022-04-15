@@ -4,42 +4,61 @@ Books
 {% endblock %}
 
 {% block body %}
-<div class="container">
-  <div class="jumbotron">
+<div style="color: #fff;" class="container">
+  <center>
+    {% if get_flashed_messages() %}
+        <header>
+          <div style="font-family: 'Rubik Bubbles', cursive; width: 1100px;" class="alert alert-danger" role="alert">
+            {{ get_flashed_messages() | join(" ") }}
+          </div>
+        </header>
+      {% endif %}
+    </center>
+  <div class="bg-dark jumbotron">
     <center>
       <h1  style="font-family:  'Lora', serif;">{{resultados[0]['title']}}</h1><br>
-      <p>by {{resultados[0]['author']}}</p>
-      <p>Published in {{resultados[0]['year']}}</p>
-      <p>Isbn: {{resultados[0]['isbn']}}</p>
-      <p>number of ratings: {{count}}</p>
-      <p>average ratings: {{rating}}</p>
+      <p style="font-family: 'Rubik Bubbles', cursive">by {{resultados[0]['author']}}</p>
+      <p style="font-family: 'Rubik Bubbles', cursive">Published in {{resultados[0]['year']}}</p>
+      <p style="font-family: 'Rubik Bubbles', cursive">Isbn: {{resultados[0]['isbn']}}</p>
+      <p style="font-family: 'Rubik Bubbles', cursive">Number of ratings: {{count}}</p>
+      <p style="font-family: 'Rubik Bubbles', cursive">Average ratings: {{rating}}</p>
   </center>
 
   </div>
 </div>
 
-<h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3><br>
+
+{% for review in ayudas %}
+<br><br><div class="container mt-3">
+  <div class="media border p-3">
+    <img src="https://www.w3schools.com/bootstrap4/img_avatar3.png"class="mr-3 mt-3 rounded-circle" style="width:60px;">
+    <div class="media-body">
+      <h4>{{ review['usuario'] }} <small><i>rated this book recently</i></small></h4>
+      <h5>{{ review['rating'] }} ⭐</h5>
+      <p>{{ review['comentario'] }}</p>      
+    </div>
+  </div>
+</div>
+{% endfor %} 
+
+<br><br><br><h3  style="margin-left: 150px; font-family:  'Lora', serif;" >Leave a review</h3><br>
+
 {% for books in resultados %}
 <form action="/libros/{{books.isbn}}" , method="post">
   {% endfor %} 
   <div class="form-group" >
-    <label  style="margin-left: 150px;" for="sel1">Rate with stars:</label>
-    <select  style="margin-left: 150px; width: 160px;" class="form-control" name="rating">
+    <label  style="margin-left: 150px; font-family: 'Rubik Bubbles', cursive;" for="sel1">Rate with stars:</label>
+    <select  style="margin-left: 150px; width: 160px; " class="form-control" name="rating">
       <option value="1">⭐</option>
       <option value="2">⭐⭐</option>
       <option value="3">⭐⭐⭐</option>
       <option value="4">⭐⭐⭐⭐</option>
       <option value="5">⭐⭐⭐⭐⭐</option>
     </select>
-  <br><label  style="margin-left: 150px;"  for="comment">Comment:</label>
+  <br><label  style="margin-left: 150px; font-family: 'Rubik Bubbles', cursive;"  for="comment">Comment:</label>
   <textarea  style="margin-left: 150px; width: 600px;"  name="comentario" class="form-control" rows="5" id="comment"></textarea><br>
-  <button  style="margin-left: 150px;"  type="submit" class="btn btn-primary">Submit</button>
+  <button   style="margin-left: 150px; font-family: 'Rubik Bubbles', cursive;"  type="submit" class="btn btn-primary">Submit</button><br><br>
 </div>
 </form>
 
-{% for review in ayudas %}
-<p>{{ review['usuario'] }}</p>
-<p>{{ review['rating'] }}</p>
-<p>{{ review['comentario'] }}</p>
-{% endfor %} 
 {% endblock %}
